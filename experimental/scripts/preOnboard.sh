@@ -140,6 +140,29 @@ function configure_ssh_key() {
     fi
 }
 
+function check_restjavad_status() {
+    # Workaround for ID710809
+    for i in $(seq 3); do
+        echo "Checking status of restjavad..."
+        if [ $(curl -sk --user admin:admin -o /dev/null -w "%{http_code}" https://localhost/mgmt/tm/sys/available) = "200" ]; then
+            echo "restjavad is running properly"
+            stat="SUCCESS"
+            break
+        else
+            stat="FAILURE"
+            echo "Restarting restjavad"
+            bigstart restart restjavad
+            if [ $i != "3" ]; then
+                sleep 60
+            fi
+        fi
+    done
+
+    if [[ "$stat" == "FAILURE" ]]; then
+        msg="restjavad is not running properly, onboarding failed..."
+        echo "$msg"
+    fi
+}
 
 function send_heat_signal() {
     #buffer wait before sending heat signal
@@ -171,6 +194,7 @@ function main() {
     prep_cloud_libs
     set_remote_hosts
     configure_ssh_key
+    check_restjavad_status
     send_heat_signal
 }
 
