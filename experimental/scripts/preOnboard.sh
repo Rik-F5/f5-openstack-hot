@@ -54,9 +54,11 @@ function verify_files() {
     for fileToVerify in "${filesToVerify[@]}"
     do
         echo verifying "$fileToVerify"
+        msg+="verifying $fileToVerify; "
         if ! tmsh run cli script verifyHash "$fileToVerify"; then
             echo "$fileToVerify" is not valid
-            msg="Unable to verify one or more files."
+            msg+="$fileToVerify is not valid; "
+            msg+="Unable to verify one or more files."
         fi
         echo verified "$fileToVerify"
     done
