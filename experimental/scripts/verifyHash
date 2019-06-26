@@ -18,12 +18,15 @@ proc script::run {} {
             set hashes(f5.policy_creator.tmpl) 06539e08d115efafe55aa507ecb4e443e83bdb1f5825a9514954ef6ca56d240ed00c7b5d67bd8f67b815ee9dd46451984701d058c89dae2434c89715d375a620
             set hashes(f5.service_discovery.tmpl) 7a4660468dffdc4f6d9aec4c1f9d22abfb3e484e7d6fe6a12fc9ab3eec3819dc34d133aea3cce4fdd87a0f4045069270061f2ea1ee7735922e4371592e498a0b
             set hashes(f5.cloud_logger.v1.0.0.tmpl) a26d5c470e70b821621476bcfd0579dbc0964f6a54158bc6314fa1e2f63b23bf3f3eb43ade5081131c24e08579db2e1e574beb3f8d9789d28acb4f312fad8c3e
+
             set file_path [lindex $tmsh::argv 1]
             set file_name [file tail $file_path]
+
             if {![info exists hashes($file_name)]} {
                 tmsh::log err "No hash found for $file_name"
                 exit 1
             }
+
             set expected_hash $hashes($file_name)
             set computed_hash [lindex [exec /usr/bin/openssl dgst -r -sha512 $file_path] 0]
             if { $expected_hash eq $computed_hash } {
